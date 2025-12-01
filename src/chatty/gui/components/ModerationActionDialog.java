@@ -5,8 +5,6 @@ import chatty.User;
 import chatty.gui.DockedDialogHelper;
 import chatty.gui.DockedDialogManager;
 import chatty.gui.MainGui;
-import chatty.gui.components.menus.ContextMenu;
-import chatty.gui.components.menus.ContextMenuAdapter;
 import chatty.gui.components.menus.ContextMenuListener;
 import chatty.util.DateTime;
 import chatty.util.dnd.DockContent;
@@ -14,11 +12,11 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Window;
-import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.JDialog;
 import javax.swing.JMenuItem;
@@ -40,12 +38,13 @@ import javax.swing.text.Element;
  */
 public class ModerationActionDialog extends JDialog {
     
+    private static final Logger LOGGER = Logger.getLogger(ModerationActionDialog.class.getName());
+    
     private static final int MAX_NUMBER_LINES = 500;
     
     private final JTextArea log;
     private final JScrollPane scroll;
     private final DockedDialogHelper helper;
-    private final MainGui main;
     
     private final List<String> entries = new ArrayList<>();
     private int displayedCount = 0;
@@ -56,7 +55,6 @@ public class ModerationActionDialog extends JDialog {
     public ModerationActionDialog(MainGui owner, DockedDialogManager dockedDialogs,
             ContextMenuListener contextMenuListener) {
         super(owner);
-        this.main = owner;
         
         log = createLogArea();
         
@@ -276,7 +274,7 @@ public class ModerationActionDialog extends JDialog {
             }
             clearSomeLines(doc);
         } catch (BadLocationException e) {
-            e.printStackTrace();
+            LOGGER.warning("Error inserting line into moderation action log: " + e);
         }
     }
     
@@ -311,9 +309,9 @@ public class ModerationActionDialog extends JDialog {
         int startOffset = firstToRemove.getStartOffset();
         int endOffset = lastToRemove.getEndOffset();
         try {
-            doc.remove(startOffset, endOffset);
+            doc.remove(startOffset, endOffset - startOffset);
         } catch (BadLocationException ex) {
-            ex.printStackTrace();
+            LOGGER.warning("Error removing lines from moderation action log: " + ex);
         }
     }
     
