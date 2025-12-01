@@ -200,7 +200,7 @@ public class SettingsManager {
         //=================
 
         settings.addBoolean("ontop", false);
-        settings.addString("laf","default");
+        settings.addString("laf","flatdark");
         settings.addString("lafTheme","Default");
         settings.addMap("lafCustomTheme", new HashMap<>(), Setting.STRING);
         settings.addLong("lafFontScale", 100);

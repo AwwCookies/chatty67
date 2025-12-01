@@ -175,6 +175,7 @@ public class MainMenu extends JMenuBar {
         addItem(extra,"dialog.subscribers");
         extra.addSeparator();
         addItem(extra,"dialog.moderationLog");
+        addItem(extra,"dialog.moderationActionLog", "Moderation Log (IRC)");
         addItem(extra,"dialog.autoModDialog");
         extra.addSeparator();
         JMenu streamChat = new JMenu("Stream Chat");
