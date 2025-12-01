@@ -49,6 +49,7 @@ import chatty.gui.components.eventlog.EventLog;
 import chatty.gui.components.FollowersDialog;
 import chatty.gui.components.LiveStreamsDialog;
 import chatty.gui.components.LivestreamerDialog;
+import chatty.gui.components.ModerationActionDialog;
 import chatty.gui.components.ModerationLog;
 import chatty.gui.components.srl.SRL;
 import chatty.gui.components.SearchDialog;
@@ -173,6 +174,7 @@ public class MainGui extends JFrame implements Runnable {
     private FollowersDialog subscribersDialog;
     private StreamChat streamChat;
     private ModerationLog moderationLog;
+    private ModerationActionDialog moderationActionDialog;
     private AutoModDialog autoModDialog;
     private EventLog eventLog;
     
@@ -319,6 +321,7 @@ public class MainGui extends JFrame implements Runnable {
         StreamChatContextMenu.client = client;
         
         moderationLog = new ModerationLog(this, dockedDialogs);
+        moderationActionDialog = new ModerationActionDialog(this, dockedDialogs, contextMenuListener);
         autoModDialog = new AutoModDialog(this, client.api, client, dockedDialogs);
         eventLog = new EventLog(this);
         EventLog.setMain(eventLog);
@@ -366,6 +369,7 @@ public class MainGui extends JFrame implements Runnable {
         windowStateManager.addWindow(followerDialog, "followers", true, true);
         windowStateManager.addWindow(subscribersDialog, "subscribers", true, true);
         windowStateManager.addWindow(moderationLog, "moderationLog", true, true);
+        windowStateManager.addWindow(moderationActionDialog, "moderationActionLog", true, true);
         windowStateManager.addWindow(streamChat, "streamChat", true, true);
         windowStateManager.addWindow(userInfoDialog.getDummyWindow(), "userInfo", true, false);
         windowStateManager.addWindow(autoModDialog, "autoMod", true, true);
@@ -564,6 +568,15 @@ public class MainGui extends JFrame implements Runnable {
             @Override
             public void actionPerformed(ActionEvent e) {
                 toggleModerationLog();
+            }
+        });
+        
+        addMenuAction("dialog.moderationActionLog", "Dialog: Moderation Log IRC (toggle)",
+                KeyEvent.VK_UNDEFINED, new AbstractAction() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                toggleModerationActionDialog();
             }
         });
         
@@ -1459,6 +1472,9 @@ public class MainGui extends JFrame implements Runnable {
         }
         else if (window == moderationLog) {
             openModerationLog();
+        }
+        else if (window == moderationActionDialog) {
+            openModerationActionDialog();
         }
         else if (window == streamChat) {
             openStreamChat();
@@ -3353,6 +3369,17 @@ public class MainGui extends JFrame implements Runnable {
         }
     }
     
+    private void openModerationActionDialog() {
+        windowStateManager.setWindowPosition(moderationActionDialog);
+        moderationActionDialog.showDialog();
+    }
+    
+    private void toggleModerationActionDialog() {
+        if (!closeDialog(moderationActionDialog)) {
+            openModerationActionDialog();
+        }
+    }
+    
     private void openAutoModDialog() {
         windowStateManager.setWindowPosition(autoModDialog);
         autoModDialog.showDialog();
@@ -4015,6 +4042,7 @@ public class MainGui extends JFrame implements Runnable {
                 highlightedMessages.addBan(user, duration, reason, id);
                 ignoredMessages.addBan(user, duration, reason, id);
                 routingManager.addBan(user, duration, reason, id);
+                moderationActionDialog.addBan(user, duration, reason, id);
             }
         });
     }
@@ -4030,6 +4058,7 @@ public class MainGui extends JFrame implements Runnable {
             highlightedMessages.addBan(user, -2, null, targetMsgId);
             ignoredMessages.addBan(user, -2, null, targetMsgId);
             routingManager.addBan(user, -2, null, targetMsgId);
+            moderationActionDialog.addDeletedMessage(user, targetMsgId, msg);
         });
     }
 
